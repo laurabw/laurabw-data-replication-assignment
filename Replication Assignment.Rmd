@@ -9,22 +9,51 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+First, I will load the {readr} package, to make loading in data much easier!
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+library(curl)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+Now to load my data from Group B:
+```{r}
+f <- curl("https://raw.githubusercontent.com/laurabw/laurabw-data-replication-assignment/master/Group%20B_ForLaura.csv")
+Group_B <- read.csv(f, header = TRUE, sep = ",", stringsAsFactors = FALSE)
+head(Group_B)
+str(Group_B)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+Group_B$DURATION..MIN.
+```
+
+Let's do the same for Group G:
+
+```{r}
+f <- curl("https://raw.githubusercontent.com/laurabw/laurabw-data-replication-assignment/master/GroupG_ForLaura.csv")
+Group_G <- read.csv(f, header = TRUE, sep = ",", stringsAsFactors = FALSE)
+head(Group_G)
+```
+
+```{r}
+Group_G$DURATION.MIN
+```
+
+
+Let's do some basic descriptive stats for these:
+
+For Group B, let's find the mean encounter time:
+
+```{r}
+mean(Group_B$DURATION..MIN.)
+```
+
+
+```{r}
+mean(Group_G$DURATION.MIN, na.rm = TRUE)
+```
+
+```{r}
+wilcox.test(Group_B$DURATION..MIN., Group_G$DURATION.MIN, conf.int = TRUE)
+```
+
