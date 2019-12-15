@@ -31,12 +31,22 @@ Let's do the same for Group G:
 
 ```{r}
 f <- curl("https://raw.githubusercontent.com/laurabw/laurabw-data-replication-assignment/master/GroupG_ForLaura.csv")
-Group_G <- read.csv(f, header = TRUE, sep = ",", stringsAsFactors = FALSE)
-head(Group_G)
+GroupG_ForLaura <- read.csv(f, header = TRUE, sep = ",", stringsAsFactors = FALSE)
+head(GroupG_ForLaura)
 ```
 
+In looking at the full data frame for Group G in another window on R Studio, I realized that there were several rows that had only NA for all answers, probably just empty rows that did not get cleaned up when the data was sent to me. So that we do not have to do deal with those let's clean up this data by removing all NAs from the data:
+
 ```{r}
-Group_G$DURATION.MIN
+Group_G <- na.omit(GroupG_ForLaura)
+Group_G
+```
+
+Beautiful! Now let's see what just the encounter duration times look like for Group G:
+
+
+```{r}
+Group_G$`DURATION MIN`
 ```
 
 
@@ -50,10 +60,146 @@ mean(Group_B$DURATION..MIN.)
 
 
 ```{r}
-mean(Group_G$DURATION.MIN, na.rm = TRUE)
+mean(Group_G$`DURATION MIN`)
 ```
 
 ```{r}
-wilcox.test(Group_B$DURATION..MIN., Group_G$DURATION.MIN, conf.int = TRUE)
+Mann_Whitney_encounter <- wilcox.test(Group_B$DURATION..MIN.,Group_G$`DURATION MIN`, conf.int = TRUE, exact = 
+FALSE)
+Mann_Whitney_encounter
+Z <- qnorm(Mann_Whitney_encounter$p.value/2)
+Z
 ```
 
+
+In the paper, they split their data into 6 periods to ....
+```{r}
+library(tidyverse)
+Group_B1 <- Group_B %>% slice(1:6)
+Group_B1
+Group_B1_mean <- mean(Group_B1$Max.min.Dist...m.)
+Group_B1_mean
+```
+
+```{r}
+Group_B2 <- Group_B %>% slice(7:10)
+Group_B2
+Group_B2_mean <- mean(Group_B2$Max.min.Dist...m.)
+Group_B2_mean
+```
+
+
+```{r}
+Group_B3 <- Group_B %>% slice(11:14)
+Group_B3
+Group_B3_mean <- mean(Group_B3$Max.min.Dist...m.)
+Group_B3_mean
+```
+
+```{r}
+Group_B4 <- Group_B %>% slice(15:21)
+Group_B4
+Group_B4_mean <- mean(Group_B4$Max.min.Dist...m.)
+Group_B4_mean
+```
+
+```{r}
+Group_B5 <- Group_B %>% slice(22:28)
+Group_B5
+Group_B5_mean <- mean(Group_B5$Max.min.Dist...m.)
+Group_B5_mean
+```
+
+```{r}
+Group_B6 <- Group_B %>% slice(22:28)
+Group_B6
+Group_B6_mean <- mean(Group_B6$Max.min.Dist...m.)
+Group_B6_mean
+```
+
+Now let's do the same thing for Group G:
+
+```{r}
+Group_G1 <- Group_G %>% slice(1:19)
+Group_G1
+Group_G1_mean <- mean(Group_G1$`Max-min Dist.`)
+Group_G1_mean
+```
+
+```{r}
+Group_G2 <- Group_G %>% slice (20:39)
+Group_G2
+Group_G2_mean <- mean(Group_G2$`Max-min Dist.`)
+Group_G2_mean
+```
+
+```{r}
+Group_G3 <- Group_G %>% slice (40:57)
+Group_G3
+Group_G3_mean <- mean(Group_G3$`Max-min Dist.`)
+Group_G3_mean
+```
+
+```{r}
+Group_G4 <- Group_G %>% slice (58:72)
+Group_G4
+Group_G4_mean <- mean(Group_G4$`Max-min Dist.`)
+Group_G4_mean
+```
+
+```{r}
+Group_G5 <- Group_G %>% slice (73:87)
+Group_G5
+Group_G5_mean <- mean(Group_G5$`Max-min Dist.`)
+Group_G5_mean
+```
+
+```{r}
+Group_G6 <- Group_G %>% slice (88:107)
+Group_G6
+Group_G6_mean <- mean(Group_G6$`Max-min Dist.`)
+Group_G6_mean
+```
+
+Ok, now let's put the means and sums for each period for each group into a data frame.
+
+```{r}
+Group_BandG_Distance <- data.frame(Period=c(1,2,3,4,5,6), GroupB_Mean = c(Group_B1_mean, Group_B2_mean, Group_B3_mean, Group_B4_mean, Group_B5_mean, Group_B6_mean), GroupG_Mean = c(Group_G1_mean, Group_G2_mean, Group_G3_mean, Group_G4_mean, Group_G5_mean, Group_G6_mean))
+Group_BandG_Distance
+```
+
+That looks nice! Next, let's see if this affects the Mann-Whitney Test:
+
+```{r}
+kruskal_distance <- kruskal.test(Group_BandG_Distance$GroupG_Mean, Group_BandG_Distance$GroupB_Mean)
+kruskal_distance
+```
+
+```{r}
+Mann_Whitney_encounter_P1 <-wilcox.test(Group_B1$DURATION..MIN., Group_G1$`DURATION MIN`)
+Mann_Whitney_encounter_P1
+```
+
+```{r}
+mean(Group_B$Max.min.Dist...m.)
+mean(Group_G$`Max-min Dist.`)
+```
+
+In order to replicate a figure from the article, I will need to create another data frame that includes the 1-6 Periods they split the total encounter days into, the four main types of behaviors observed, and the percentage of time each of these behaviors were observed during each of the periods. This took awhile to figure out how to fit this all in to one data frame, but in the end, it worked out if period was just repeated four times for each behavior, knowing that when I made the historgram from the data frame using {ggplot2} and the (ggplot) function, it would know to group all of the behaviors in the same period together. 
+
+```{r}
+Group_G_Behavior <- data.frame(Period = c(1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6), Percentage_Time = c(20, 5, 57, 18, 18, 0, 32, 50, 18, 0, 5, 77, 7, 7, 7, 79, 20, 0, 5, 75, 4, 4, 4, 88), Behavior = c("Avoid", "Threaten/Flee", "Monitor", "Ignore","Avoid", "Threaten/Flee", "Monitor", "Ignore","Avoid", "Threaten/Flee", "Monitor", "Ignore","Avoid", "Threaten/Flee", "Monitor", "Ignore","Avoid", "Threaten/Flee", "Monitor", "Ignore","Avoid", "Threaten/Flee", "Monitor", "Ignore"))
+Group_G_Behavior
+```
+
+Now that we have a data frame that should give us the results we want, I next had to figure out how to do a "stacked" histogram, with each bar being able to be split into the multiple behavior categories so that it would equal up to 100% while also showing the percentage for each behavior separately. I also had to adjust the levels of the behavior variables so they would stack in the same order as they do in the paper.
+
+```{r}
+Behavior_Hist <- ggplot(data = Group_G_Behavior, aes(x = Period, y = Percentage_Time, fill = Behavior)) +   geom_bar(stat = "identity")
+Behavior_Hist
+Group_G_Behavior$Behavior <- factor(Group_G_Behavior$Behavior, levels = c ("Avoid", "Threaten/Flee", "Monitor", "Ignore")) #by changing these levels, I was able to have them in the same order they are in on the historgram in the article
+Behavior_Hist <- ggplot(data = Group_G_Behavior, aes(x = Period, y = Percentage_Time, fill = Behavior)) +   geom_bar(stat = "identity")
+Behavior_Hist
+```
+
+I think this looks nice and pretty similar to the image in the paper as far as overall asthetic. The big difference is that ours is in color, though you could easily change this to another color theme, including a grayscale one that would print better in black and white.
