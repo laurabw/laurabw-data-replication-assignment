@@ -6,7 +6,8 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, comment = "##", prompt = TRUE, 
+   tidy = TRUE, tidy.opts = list(width.cutoff = 75), fig.path = "img/")
 ```
 
 First, I will load the {readr} package, to make loading in data much easier!
@@ -168,12 +169,7 @@ Group_BandG_Distance <- data.frame(Period=c(1,2,3,4,5,6), GroupB_Mean = c(Group_
 Group_BandG_Distance
 ```
 
-That looks nice! Next, let's see if this affects the Mann-Whitney Test:
 
-```{r}
-kruskal_distance <- kruskal.test(Group_BandG_Distance$GroupG_Mean, Group_BandG_Distance$GroupB_Mean)
-kruskal_distance
-```
 
 ```{r}
 Mann_Whitney_encounter_P1 <-wilcox.test(Group_B1$DURATION..MIN., Group_G1$`DURATION MIN`)
@@ -203,3 +199,6 @@ Behavior_Hist
 ```
 
 I think this looks nice and pretty similar to the image in the paper as far as overall asthetic. The big difference is that ours is in color, though you could easily change this to another color theme, including a grayscale one that would print better in black and white.
+
+
+<img src="img/Histogram_Image.PNG" width="700px"/>
